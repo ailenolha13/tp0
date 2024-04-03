@@ -45,10 +45,12 @@ int main(void)
 
 	// Creamos una conexión hacia el servidor
 	conexion = crear_conexion(ip, puerto);
-
+	log_info(logger, "Conexion creada hacia el servidor");
 	// Enviamos al servidor el valor de CLAVE como mensaje
+	enviar_mensaje(valor, conexion);
 
 	// Armamos y enviamos el paquete
+	log_info(logger, "Comenzando a armar el paquete:");
 	paquete(conexion);
 
 	terminar_programa(conexion, logger, config);
@@ -100,12 +102,36 @@ void paquete(int conexion)
 {
 	// Ahora toca lo divertido!
 	char* leido;
-	t_paquete* paquete;
+	t_paquete* paquete = crear_paquete();
+
+	// Leemos y esta vez agregamos las lineas al paquete
+	leido = readline("> String: "); // Leo de consola
+	while (strcmp(leido, "")){ // Mientras no sea cadena vacia
+		agregar_a_paquete(paquete, leido, strlen(leido)+1); // Agregamos al paquete el stream
+		leido = readline("> String: "); // Leo nueva linea
+	}
+	enviar_paquete(paquete, conexion); // Enviamos el paquete
+
+	/*
+	paquete = malloc(sizeof(t_paquete)); // almaceno el tamaño de memoria con el tamaño de paquete
+	paquete->codigo_operacion = PAQUETE; // Declaro que el paquete es tipo paquete
 
 	// Leemos y esta vez agregamos las lineas al paquete
 
-
+	leido = readline("> "); // Leo de consola
+	int offset = 0; // Declaro offset
+	while (strcmp(leido, "")){ // Mientras no sea cadena vacia
+		memcpy(paquete->buffer->stream + offset, leido, sizeof(leido)); // Copia lo que esta en leido a el stream del buffer sumandole el off set y con el tamaño de leido
+		offset += sizeof(leido); // Aumento el offset en el tamaño de leido
+		leido = readline("> "); // Leo nueva linea
+	}
+	paquete->buffer->size = sizeof(paquete->buffer->stream); // Declaro el tamaño del buffer con el stream del buffer
+	send(conexion, paquete->buffer->stream, paquete->buffer->size, 0); // Envio a conexion el stream del buffer con el tamaño del buffer y de flag mando un 0
+	*/
 	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
+
+	free(leido);
+	eliminar_paquete(paquete);
 	
 }
 
@@ -116,5 +142,6 @@ void terminar_programa(int conexion, t_log* logger, t_config* config)
 
 	  log_destroy(logger);
 	  config_destroy(config);
+	  liberar_conexion(conexion);
 	  
 }
