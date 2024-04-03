@@ -30,7 +30,7 @@ int iniciar_servidor(void)
 
 	// Escuchamos las conexiones entrantes
 
-	if ( listen(socket_servidor, SOMAXCONN) == -1) { // Cambiar conexiones vivas
+	if ( listen(socket_servidor, SOMAXCONN) == -1) { 
 		exit(5);
 	}
 
@@ -42,11 +42,11 @@ int iniciar_servidor(void)
 
 int esperar_cliente(int socket_servidor)
 {
-	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
-
 	// Aceptamos un nuevo cliente
-	int socket_cliente;
+	int socket_cliente = accept(socket_servidor, NULL, NULL);
+	if ( socket_cliente == -1 ) {
+		exit(6);
+	}
 	log_info(logger, "Se conecto un cliente!");
 
 	return socket_cliente;
