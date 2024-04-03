@@ -4,9 +4,6 @@ t_log *logger;
 
 int iniciar_servidor(void)
 {
-	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
-
 	int socket_servidor;
 
 	struct addrinfo hints, *servinfo, *p;
@@ -21,10 +18,21 @@ int iniciar_servidor(void)
 	// Creamos el socket de escucha del servidor
 
 	socket_servidor = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+	if ( socket_servidor == -1) {
+		exit(3);
+	}
 
 	// Asociamos el socket a un puerto
 
+	if ( bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen) == -1) {
+		exit(4);
+	}
+
 	// Escuchamos las conexiones entrantes
+
+	if ( listen(socket_servidor, SOMAXCONN) == -1) { // Cambiar conexiones vivas
+		exit(5);
+	}
 
 	freeaddrinfo(servinfo);
 	log_trace(logger, "Listo para escuchar a mi cliente");
